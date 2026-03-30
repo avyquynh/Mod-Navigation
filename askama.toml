@@ -1,0 +1,4 @@
+[general]
+# Directory where templates are located
+template_dir = "templates"
+default_extension = "html"

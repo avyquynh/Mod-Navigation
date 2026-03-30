@@ -1,0 +1,13 @@
+[package]
+name = "solar-spell-library"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4"
+actix-files = "0.6.6"
+askama = { version = "0.12.0"}
+askama_actix = "0.14"
+rusqlite = { version = "0.31.0", features = ["bundled"]}
+serde = { version = "1.0.204", features = ["derive"] }
+mime = "0.3"
