@@ -1,0 +1,14 @@
+/Users/avyquynh/Documents/GIT/Mod-Navigation/target/debug/deps/serde-a2fa4bda50a7f79b.d: /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/avyquynh/Documents/GIT/Mod-Navigation/target/debug/build/serde-2beb76a2a4a45d11/out/private.rs
+
+/Users/avyquynh/Documents/GIT/Mod-Navigation/target/debug/deps/libserde-a2fa4bda50a7f79b.rlib: /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/avyquynh/Documents/GIT/Mod-Navigation/target/debug/build/serde-2beb76a2a4a45d11/out/private.rs
+
+/Users/avyquynh/Documents/GIT/Mod-Navigation/target/debug/deps/libserde-a2fa4bda50a7f79b.rmeta: /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /Users/avyquynh/Documents/GIT/Mod-Navigation/target/debug/build/serde-2beb76a2a4a45d11/out/private.rs
+
+/Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/Users/avyquynh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/Users/avyquynh/Documents/GIT/Mod-Navigation/target/debug/build/serde-2beb76a2a4a45d11/out/private.rs:
+
+# env-dep:OUT_DIR=/Users/avyquynh/Documents/GIT/Mod-Navigation/target/debug/build/serde-2beb76a2a4a45d11/out
