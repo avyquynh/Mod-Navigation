@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ folder_name }}{% endblock %}
+
+{% block content %}
+<h1>Index of {{ folder_name }}</h1>
+<hr>
+{% if folder_name != "root_folder" %}
+    <a href="javascript:history.back()">Back</a>
+{% endif %}
+<ul>
+    {% for item in items %}
+    <li>
+        {% if item.is_folder %}
+            <strong>Folder:</strong> <a href="/folder/{{ item.path }}">{{ item.name }}</a>
+        {% else %}
+            <strong>File:</strong> <a href="/file/{{ item.path }}">{{ item.name }}</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

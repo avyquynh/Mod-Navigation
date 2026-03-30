@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ name }}{% endblock %}
+
+{% block content %}
+<h1>{{ name }}</h1>
+<a href="javascript:history.back()">Back</a>
+
+<div class="content-container" style="margin-top: 20px;">
+    {% if file_type == "pdf" %}
+        <embed src="{{ path }}" type="application/pdf" width="100%" height="800px" />
+    {% else if file_type == "video" %}
+        <video controls>
+            <source src="{{ path }}" type="video/mp4">
+        </video>
+    {% else if file_type == "audio" %}
+        <audio controls>
+            <source src="{{ path }}" type="audio/mpeg">
+        </audio>
+    {% else if file_type == "html" %}
+        <iframe src="{{ path }}" width="100%" height="800px"></iframe>
+
+    {% endif %}
+</div>
+{% endblock %}
