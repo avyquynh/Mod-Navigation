@@ -8,9 +8,9 @@
 <div class="content-container" style="margin-top: 20px;">
     {% if file_type == "pdf" %}
         <iframe 
-            src="http://www.solarcubed.org/dev-content-ea/{{ data.file_name }}" 
+            src="{{ path }}" 
             style="min-height: 750px; width: 100%; border: none;">
-        </iframe>   
+        </iframe>
     {% else if file_type == "video" %}
         <video controls>
             <source src="{{ path }}" type="video/mp4">
