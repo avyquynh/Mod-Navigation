@@ -1,5 +1,4 @@
-    use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-    use askama::Template;
+    use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};    use askama::Template;
     use std::fs;
     use std::path::Path;
     
@@ -9,6 +8,7 @@
         name: String,
         path: String,
         file_type: String,
+        file_name: String,
     }
     
     #[derive(Template)]
@@ -43,19 +43,28 @@
         render_folder(&path.into_inner())
     }
     
-    #[get("/file/{tail:.*}")]
+    #[get("/file/{path:.*}")]
     async fn view_file(path: web::Path<String>) -> impl Responder {
-        let full_path = path.into_inner();
-        let name = Path::new(&full_path)
+        let file_path = path.into_inner();
+        
+        let name = Path::new(&file_path)
             .file_name()
             .unwrap_or_default()
             .to_string_lossy()
             .to_string();
-        
+
+        let file_type = get_file_type(&file_path);
+        let web_path = if get_file_type(&file_path) == "pdf" {
+            format!("/pdf/{}", file_path)
+        } else {
+            format!("/static/{}", file_path)
+        };
+
         let template = FileTemplate {
-            file_type: get_file_type(&full_path),
-            path: format!("/static/{}", full_path),
-            name,
+            name: name.clone(),
+            path: web_path,
+            file_type,
+            file_name: name,
         };
     
         match template.render() {
@@ -63,7 +72,19 @@
             Err(_) => HttpResponse::InternalServerError().body("Template Error"),
         }
     }
-    
+
+    #[get("/pdf/{path:.*}")]
+    async fn serve_pdf(path: web::Path<String>) -> impl Responder {
+        let file_path = path.into_inner();
+        
+        match fs::read(&file_path) {
+            Ok(bytes) => HttpResponse::Ok()
+                .content_type("application/pdf")
+                .insert_header(("Content-Disposition", "inline"))
+                .body(bytes),
+            Err(_) => HttpResponse::NotFound().body("File not found"),
+        }
+    }
     fn render_folder(folder_path: &str) -> HttpResponse {
         let mut items = Vec::new();
         
@@ -98,13 +119,19 @@
     
         HttpServer::new(|| {
             App::new()
-                .service(actix_files::Files::new("/static", ".").show_files_listing())
+                .service(
+                    actix_files::Files::new("/static", ".")
+                    .show_files_listing()
+                    .prefer_utf8(true)
+                )
                 .service(index)
                 .service(browse_folder)
                 .service(view_file)
+                .service(serve_pdf) 
         })
         .bind(("127.0.0.1", 8080))?
         .run()
         .await
     }
+
 
