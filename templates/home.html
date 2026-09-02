@@ -18,8 +18,10 @@
 <div class="grid">
     {% for card in topics %}
     <a class="card" href="{{ card.link }}">
-        <span class="icon-circle" style="background: {{ card.color }};">
-            <img src="/icons/{{ card.icon }}" alt="" onerror="this.style.display='none'">
+        <span class="icon-wrap">
+            <span class="icon-circle">
+                <img src="/icons/{{ card.icon }}" alt="" onerror="this.style.display='none'">
+            </span>
         </span>
         <span class="label" style="background: {{ card.color }};">{{ card.name }}</span>
     </a>
@@ -30,8 +32,10 @@
 <div class="grid">
     {% for card in modules %}
     <a class="card" href="{{ card.link }}">
-        <span class="icon-circle" style="background: {{ card.color }};">
-            <img src="/icons/{{ card.icon }}" alt="" onerror="this.style.display='none'">
+        <span class="icon-wrap">
+            <span class="icon-circle">
+                <img src="/icons/{{ card.icon }}" alt="" onerror="this.style.display='none'">
+            </span>
         </span>
         <span class="label" style="background: {{ card.color }};">{{ card.name }}</span>
     </a>
