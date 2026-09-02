@@ -179,7 +179,11 @@
                     .prefer_utf8(true)
                 )
                 .service(
-                    actix_files::Files::new("/icons", "icons")
+                    actix_files::Files::new("/icons", "src/icons")
+                    .prefer_utf8(true)
+                )
+                .service(
+                    actix_files::Files::new("/header", "src/header")
                     .prefer_utf8(true)
                 )
                 .service(index)
