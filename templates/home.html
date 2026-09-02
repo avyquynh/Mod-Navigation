@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}SolarSPELL Digital Library{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <img src="/icons/hero.png" alt="" onerror="this.parentElement.style.background='linear-gradient(#8fd0ef 0%, #cfeaf6 60%, #e8dcc0 100%)'; this.style.display='none'">
+</div>
+
+<div class="searchbar">
+    <input class="search-input" type="text" placeholder="Search resources...">
+    <div class="search-buttons">
+        <button type="button">BACK TO SOLARSPELL?</button>
+        <button type="button">ADVANCED SEARCH</button>
+    </div>
+</div>
+
+<div class="section-header">General Education Topics</div>
+<div class="grid">
+    {% for card in topics %}
+    <a class="card" href="{{ card.link }}">
+        <span class="icon-circle" style="background: {{ card.color }};">
+            <img src="/icons/{{ card.icon }}" alt="" onerror="this.style.display='none'">
+        </span>
+        <span class="label" style="background: {{ card.color }};">{{ card.name }}</span>
+    </a>
+    {% endfor %}
+</div>
+
+<div class="section-header">Learning Modules</div>
+<div class="grid">
+    {% for card in modules %}
+    <a class="card" href="{{ card.link }}">
+        <span class="icon-circle" style="background: {{ card.color }};">
+            <img src="/icons/{{ card.icon }}" alt="" onerror="this.style.display='none'">
+        </span>
+        <span class="label" style="background: {{ card.color }};">{{ card.name }}</span>
+    </a>
+    {% endfor %}
+</div>
+
+<div class="footer">
+    <div class="logos">
+        <img src="/icons/solarspell-logo-full.png" alt="SolarSPELL" onerror="this.style.display='none'">
+        <img src="/icons/asu-logo.png" alt="Arizona State University" onerror="this.style.display='none'">
+    </div>
+    <a class="about-btn" href="/">About Us</a>
+    <p>version SAF 1.2</p>
+    <p>
+        SolarSPELL (Solar Powered Educational Learning Library) works to<br>
+        build internet-ready skills and improve educational opportunities<br>
+        around the world.
+    </p>
+    <p>Contact us at <a href="mailto:team@solarspell.org">team@solarspell.org</a></p>
+    <p>
+        Copyright &copy; 2023. All content on this library is either open access or the<br>
+        SolarSPELL Initiative at ASU has received permission to include it in this<br>
+        library. The design and layout of the library's user interface is copyrighted by<br>
+        Arizona Board of Regents on behalf of Arizona State University.
+    </p>
+</div>
+{% endblock %}

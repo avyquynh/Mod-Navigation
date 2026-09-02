@@ -23,6 +23,31 @@
         path: String,
         is_folder: bool,
     }
+
+    #[derive(Template)]
+    #[template(path = "home.html")]
+    struct HomeTemplate {
+        topics: Vec<Card>,
+        modules: Vec<Card>,
+    }
+
+    struct Card {
+        name: String,
+        icon: String,
+        color: String,
+        link: String,
+    }
+
+    impl Card {
+        fn new(name: &str, icon: &str, color: &str, link: &str) -> Self {
+            Card {
+                name: name.to_string(),
+                icon: icon.to_string(),
+                color: color.to_string(),
+                link: link.to_string(),
+            }
+        }
+    }
     
     fn get_file_type(path: &str) -> String {
         let path = path.to_lowercase();
@@ -35,7 +60,36 @@
     
     #[get("/")]
     async fn index() -> impl Responder {
-        render_folder("root_folder")
+        let topics = vec![
+            Card::new("Arts", "arts.png", "#e8802a", "/folder/root_folder"),
+            Card::new("Educational Tools", "educational-tools.png", "#c9a227", "/folder/root_folder"),
+            Card::new("Health & Safety", "health-safety.png", "#c0392b", "/folder/root_folder"),
+            Card::new("Information Literacy & Digital Literacy", "info-literacy.png", "#5a5a5a", "/folder/root_folder"),
+            Card::new("Language & Reading", "language-reading.png", "#4a9c3f", "/folder/root_folder"),
+            Card::new("Local Resources", "local-resources.png", "#a01f4a", "/folder/root_folder"),
+            Card::new("Mathematics", "mathematics.png", "#6a4c93", "/folder/root_folder"),
+            Card::new("Science", "science.png", "#e8b800", "/folder/root_folder"),
+            Card::new("Social Studies", "social-studies.png", "#2a8fbd", "/folder/root_folder"),
+            Card::new("Sustainability", "sustainability.png", "#2aa198", "/folder/root_folder"),
+        ];
+
+        let modules = vec![
+            Card::new("SolarSPELL Training Course", "solarspell-training.png", "#2a8fbd", "/folder/root_folder"),
+            Card::new("Hesperian Health", "hesperian-health.png", "#e8802a", "/folder/root_folder"),
+            Card::new("Global Health Media", "global-health-media.png", "#1a7fc4", "/folder/root_folder"),
+            Card::new("Khan Academy", "khan-academy.png", "#2c2c2c", "/folder/root_folder"),
+            Card::new("Medical Encyclopedia", "medical-encyclopedia.png", "#3a6b35", "/folder/root_folder"),
+            Card::new("Science Activities", "science-activities.png", "#7fc4e0", "/folder/root_folder"),
+            Card::new("Bukantsee ie thesorase", "bukantsee.png", "#7ba05b", "/folder/root_folder"),
+            Card::new("Let's Learn English", "lets-learn-english.png", "#6a7bb5", "/folder/root_folder"),
+            Card::new("Wikipedia for Schools", "wikipedia-schools.png", "#4aa8a0", "/folder/root_folder"),
+        ];
+
+        let template = HomeTemplate { topics, modules };
+        match template.render() {
+            Ok(body) => HttpResponse::Ok().content_type("text/html").body(body),
+            Err(_) => HttpResponse::InternalServerError().body("Template Error"),
+        }
     }
     
     #[get("/folder/{tail:.*}")]
@@ -122,6 +176,10 @@
                 .service(
                     actix_files::Files::new("/static", ".")
                     .show_files_listing()
+                    .prefer_utf8(true)
+                )
+                .service(
+                    actix_files::Files::new("/icons", "icons")
                     .prefer_utf8(true)
                 )
                 .service(index)

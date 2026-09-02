@@ -2,16 +2,186 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SolarSPELL{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f2f2f2;
+            color: #333;
+        }
+
+        /* ---- Top nav ---- */
+        .topbar {
+            background: #1a7fc4;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 20px;
+        }
+        .topbar .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .topbar .brand img { height: 28px; }
+        .topbar nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 18px;
+            font-size: 14px;
+        }
+        .topbar nav a:hover { text-decoration: underline; }
+
+        /* ---- Hero ---- */
+        .hero {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(#8fd0ef 0%, #cfeaf6 60%, #e8dcc0 100%);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ---- Search bar ---- */
+        .searchbar {
+            background: #1a7fc4;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .searchbar .search-input {
+            width: 60%;
+            max-width: 500px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .searchbar .search-buttons { display: flex; gap: 10px; }
+        .searchbar .search-buttons button {
+            background: #0d5c94;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* ---- Section header ---- */
+        .section-header {
+            background: #1a7fc4;
+            color: #fff;
+            text-align: center;
+            padding: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 24px auto 20px;
+            max-width: 900px;
+            border-radius: 3px;
+        }
+
+        /* ---- Card grid ---- */
+        .grid {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            padding: 0 20px;
+        }
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+        }
+        .card .icon-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: #dcdcdc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid #ccc;
+        }
+        .card .icon-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .card .label {
+            margin-top: 12px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 13px;
+            padding: 8px 6px;
+            border-radius: 3px;
+        }
+
+        /* ---- Footer ---- */
+        .footer {
+            background: #fff;
+            margin-top: 40px;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.6;
+        }
+        .footer .logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+        .footer .logos img { height: 40px; }
+        .footer .about-btn {
+            display: inline-block;
+            background: #1a7fc4;
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .footer a { color: #1a7fc4; }
+
+        /* ---- Generic content (folder/file views) ---- */
+        main.content { max-width: 900px; margin: 20px auto; padding: 0 20px; }
+    </style>
 </head>
 <body>
-    <nav>
-        <a href="/">Home</a>
-    </nav>
-    <hr>
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+    <div class="topbar">
+        <div class="brand">
+            <img src="/icons/solarspell-logo.png" alt="" onerror="this.style.display='none'">
+            SolarSPELL
+        </div>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/">Index</a>
+            <a href="/">Browse users</a>
+            <a href="/">About Us</a>
+        </nav>
+    </div>
+
+    {% block content %}
+    {% endblock %}
 </body>
 </html>
