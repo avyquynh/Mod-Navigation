@@ -14,14 +14,22 @@
     #[derive(Template)]
     #[template(path = "folder_view.html")]
     struct FolderTemplate {
-        folder_name: String,
-        items: Vec<FileSystemItem>,
+        title: String,
+        crumbs: Vec<Crumb>,
+        cards: Vec<FolderCard>,
     }
-    
-    struct FileSystemItem {
+
+    struct Crumb {
         name: String,
-        path: String,
-        is_folder: bool,
+        link: String,
+        last: bool,
+    }
+
+    struct FolderCard {
+        name: String,
+        tag: String,
+        description: String,
+        link: String,
     }
 
     #[derive(Template)]
@@ -139,28 +147,107 @@
             Err(_) => HttpResponse::NotFound().body("File not found"),
         }
     }
+    // Turn a folder/file name like "learning_materials" into "Learning Materials".
+    fn prettify(name: &str) -> String {
+        name.split(|c| c == '_' || c == '-' || c == ' ')
+            .filter(|s| !s.is_empty())
+            .map(|word| {
+                let mut chars = word.chars();
+                match chars.next() {
+                    Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+                    None => String::new(),
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
+
     fn render_folder(folder_path: &str) -> HttpResponse {
-        let mut items = Vec::new();
-        
+        let mut cards = Vec::new();
+
         if let Ok(entries) = fs::read_dir(folder_path) {
-            for entry in entries.flatten() {
+            let mut sorted: Vec<_> = entries.flatten().collect();
+            sorted.sort_by_key(|e| e.file_name());
+
+            for entry in sorted {
                 let path = entry.path();
-                let name = path.file_name().unwrap().to_string_lossy().to_string();
+                let raw_name = path.file_name().unwrap().to_string_lossy().to_string();
+
+                // Skip hidden files like .DS_Store
+                if raw_name.starts_with('.') {
+                    continue;
+                }
+
                 let rel_path = path.to_string_lossy().to_string();
-                
-                items.push(FileSystemItem {
-                    name,
-                    path: rel_path,
-                    is_folder: path.is_dir(),
+                let is_folder = path.is_dir();
+
+                let (tag, description) = if is_folder {
+                    (
+                        "Folder".to_string(),
+                        "Open this folder to explore its lessons and materials.".to_string(),
+                    )
+                } else {
+                    let ftype = get_file_type(&rel_path);
+                    let tag = match ftype.as_str() {
+                        "pdf" => "PDF",
+                        "video" => "Video",
+                        "audio" => "Audio",
+                        "html" => "Lesson",
+                        _ => "File",
+                    };
+                    (
+                        tag.to_string(),
+                        format!("Open this {} resource.", tag.to_lowercase()),
+                    )
+                };
+
+                let link = if is_folder {
+                    format!("/folder/{}", rel_path)
+                } else {
+                    format!("/file/{}", rel_path)
+                };
+
+                cards.push(FolderCard {
+                    name: prettify(&raw_name),
+                    tag,
+                    description,
+                    link,
                 });
             }
         }
-    
+
+        // Build breadcrumb from the path segments.
+        let mut crumbs = vec![Crumb {
+            name: "Home".to_string(),
+            link: "/".to_string(),
+            last: false,
+        }];
+
+        let segments: Vec<&str> = folder_path.split('/').filter(|s| !s.is_empty()).collect();
+        let mut accumulated = String::new();
+        for (i, seg) in segments.iter().enumerate() {
+            if !accumulated.is_empty() {
+                accumulated.push('/');
+            }
+            accumulated.push_str(seg);
+            crumbs.push(Crumb {
+                name: prettify(seg),
+                link: format!("/folder/{}", accumulated),
+                last: i == segments.len() - 1,
+            });
+        }
+
+        let title = segments
+            .last()
+            .map(|s| prettify(s))
+            .unwrap_or_else(|| "Library".to_string());
+
         let template = FolderTemplate {
-            folder_name: folder_path.to_string(),
-            items,
+            title,
+            crumbs,
+            cards,
         };
-    
+
         match template.render() {
             Ok(body) => HttpResponse::Ok().content_type("text/html").body(body),
             Err(_) => HttpResponse::InternalServerError().body("Template Error"),

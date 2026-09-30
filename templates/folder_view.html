@@ -1,23 +1,68 @@
 {% extends "base.html" %}
-{% block title %}{{ folder_name }}{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<main class="content">
-<h1>Index of {{ folder_name }}</h1>
-<hr>
-{% if folder_name != "root_folder" %}
-    <a href="javascript:history.back()">Back</a>
-{% endif %}
-<ul>
-    {% for item in items %}
-    <li>
-        {% if item.is_folder %}
-            <strong>Folder:</strong> <a href="/folder/{{ item.path }}">{{ item.name }}</a>
+<div class="breadcrumb">
+    {% for crumb in crumbs %}
+        {% if crumb.last %}
+            <span style="color:#1a7fc4; font-weight:bold;">{{ crumb.name }}</span>
         {% else %}
-            <strong>File:</strong> <a href="/file/{{ item.path }}">{{ item.name }}</a>
+            <a href="{{ crumb.link }}">{{ crumb.name }}</a><span class="sep">&gt;</span>
         {% endif %}
-    </li>
     {% endfor %}
-</ul>
-</main>
+</div>
+
+<div class="folder-head">
+    <h1>{{ title }}</h1>
+    <div class="folder-search">
+        <span class="mag">&#128269;</span>
+        <input type="text" placeholder="Search course materials" oninput="filterCards(this.value)">
+    </div>
+</div>
+
+<div class="filter-pills">
+    <button class="pill active" onclick="filterTag(this, 'all')">All</button>
+    <button class="pill" onclick="filterTag(this, 'Folder')">Folders</button>
+    <button class="pill" onclick="filterTag(this, 'Lesson')">Lessons</button>
+    <button class="pill" onclick="filterTag(this, 'PDF')">PDFs</button>
+    <button class="pill" onclick="filterTag(this, 'Video')">Videos</button>
+</div>
+
+<div class="course-grid" id="cardGrid">
+    {% for card in cards %}
+    <div class="course-card" data-tag="{{ card.tag }}" data-name="{{ card.name }}">
+        <div class="thumb">
+            <img src="/header/logo.png" alt="" onerror="this.style.display='none'">
+        </div>
+        <div class="body">
+            <span class="tag">{{ card.tag }}</span>
+            <h3>{{ card.name }}</h3>
+            <p class="desc">{{ card.description }}</p>
+            <p class="cert">&#9989; Certificate of Completion provided.</p>
+            <a class="start-btn" href="{{ card.link }}">Start</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function filterTag(btn, tag) {
+        document.querySelectorAll('.filter-pills .pill').forEach(function (p) {
+            p.classList.remove('active');
+        });
+        btn.classList.add('active');
+        document.querySelectorAll('#cardGrid .course-card').forEach(function (card) {
+            var show = (tag === 'all') || (card.getAttribute('data-tag') === tag);
+            card.style.display = show ? '' : 'none';
+        });
+    }
+
+    function filterCards(query) {
+        query = query.toLowerCase();
+        document.querySelectorAll('#cardGrid .course-card').forEach(function (card) {
+            var name = card.getAttribute('data-name').toLowerCase();
+            card.style.display = name.indexOf(query) !== -1 ? '' : 'none';
+        });
+    }
+</script>
 {% endblock %}
