@@ -33,6 +33,19 @@
     }
 
     #[derive(Template)]
+    #[template(path = "folder_list.html")]
+    struct FolderListTemplate {
+        title: String,
+        items: Vec<FileSystemItem>,
+    }
+
+    struct FileSystemItem {
+        name: String,
+        path: String,
+        is_folder: bool,
+    }
+
+    #[derive(Template)]
     #[template(path = "home.html")]
     struct HomeTemplate {
         topics: Vec<Card>,
@@ -163,6 +176,12 @@
     }
 
     fn render_folder(folder_path: &str) -> HttpResponse {
+        // Only the top-level root_folder gets the card layout.
+        // Every deeper folder falls back to the simple hyperlink list.
+        if folder_path.trim_end_matches('/') != "root_folder" {
+            return render_folder_list(folder_path);
+        }
+
         let mut cards = Vec::new();
 
         if let Ok(entries) = fs::read_dir(folder_path) {
@@ -246,6 +265,43 @@
             title,
             crumbs,
             cards,
+        };
+
+        match template.render() {
+            Ok(body) => HttpResponse::Ok().content_type("text/html").body(body),
+            Err(_) => HttpResponse::InternalServerError().body("Template Error"),
+        }
+    }
+
+    // Old-style simple hyperlink listing, used for every folder except root_folder.
+    fn render_folder_list(folder_path: &str) -> HttpResponse {
+        let mut items = Vec::new();
+
+        if let Ok(entries) = fs::read_dir(folder_path) {
+            let mut sorted: Vec<_> = entries.flatten().collect();
+            sorted.sort_by_key(|e| e.file_name());
+
+            for entry in sorted {
+                let path = entry.path();
+                let name = path.file_name().unwrap().to_string_lossy().to_string();
+
+                if name.starts_with('.') {
+                    continue;
+                }
+
+                let rel_path = path.to_string_lossy().to_string();
+
+                items.push(FileSystemItem {
+                    name,
+                    path: rel_path,
+                    is_folder: path.is_dir(),
+                });
+            }
+        }
+
+        let template = FolderListTemplate {
+            title: folder_path.to_string(),
+            items,
         };
 
         match template.render() {

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<main class="content">
+<h1>Index of {{ title }}</h1>
+<hr>
+<a href="javascript:history.back()">Back</a>
+<ul>
+    {% for item in items %}
+    <li>
+        {% if item.is_folder %}
+            <strong>Folder:</strong> <a href="/folder/{{ item.path }}">{{ item.name }}</a>
+        {% else %}
+            <strong>File:</strong> <a href="/file/{{ item.path }}">{{ item.name }}</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+</main>
+{% endblock %}
