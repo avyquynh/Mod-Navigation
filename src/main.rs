@@ -96,12 +96,10 @@
 
         let modules = vec![
             Card::new("SolarSPELL Training Course", "solarspell-training.png", "#2a8fbd", "/folder/root_folder"),
-            Card::new("Hesperian Health", "hesperian-health.png", "#e8802a", "/folder/root_folder"),
             Card::new("Global Health Media", "global-health-media.png", "#1a7fc4", "/folder/root_folder"),
             Card::new("Khan Academy", "khan-academy.png", "#2c2c2c", "/folder/root_folder"),
             Card::new("Medical Encyclopedia", "medical-encyclopedia.png", "#3a6b35", "/folder/root_folder"),
             Card::new("Science Activities", "science-activities.png", "#7fc4e0", "/folder/root_folder"),
-            Card::new("Bukantsee ie thesorase", "bukantsee.png", "#7ba05b", "/folder/root_folder"),
             Card::new("Let's Learn English", "lets-learn-english.png", "#6a7bb5", "/folder/root_folder"),
             Card::new("Wikipedia for Schools", "wikipedia-schools.png", "#4aa8a0", "/folder/root_folder"),
         ];
@@ -176,8 +174,6 @@
     }
 
     fn render_folder(folder_path: &str) -> HttpResponse {
-        // Only the top-level root_folder gets the card layout.
-        // Every deeper folder falls back to the simple hyperlink list.
         if folder_path.trim_end_matches('/') != "root_folder" {
             return render_folder_list(folder_path);
         }
@@ -273,7 +269,6 @@
         }
     }
 
-    // Old-style simple hyperlink listing, used for every folder except root_folder.
     fn render_folder_list(folder_path: &str) -> HttpResponse {
         let mut items = Vec::new();
 
