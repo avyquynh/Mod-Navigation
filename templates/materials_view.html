@@ -20,11 +20,6 @@
     </div>
 </div>
 
-<div class="course-title">
-    <img src="/header/logo.png" alt="" onerror="this.style.display='none'">
-    <h2>{{ course_name }}</h2>
-</div>
-
 <div class="materials" id="materials">
     {% for section in sections %}
     <div class="accordion {% if section.open %}open{% endif %}">
@@ -37,7 +32,6 @@
                 <span class="chevron">&#9662;</span>
             </button>
         </div>
-        <p class="acc-desc">{{ section.description }}</p>
         <div class="acc-body">
             {% for file in section.files %}
             <a class="file-row" href="{{ file.link }}" data-name="{{ file.name }}">

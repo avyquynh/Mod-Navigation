@@ -49,7 +49,6 @@
     #[template(path = "materials_view.html")]
     struct MaterialsTemplate {
         title: String,
-        course_name: String,
         crumbs: Vec<Crumb>,
         sections: Vec<MaterialSection>,
     }
@@ -57,7 +56,6 @@
     struct MaterialSection {
         number: String,
         name: String,
-        description: String,
         open: bool,
         files: Vec<MaterialFile>,
     }
@@ -349,7 +347,6 @@
                     sections.push(MaterialSection {
                         number: String::new(), // numbered after collection
                         name: prettify(&raw_name),
-                        description: "Browse the resources in this section.".to_string(),
                         open: false,
                         files,
                     });
@@ -369,7 +366,6 @@
                 MaterialSection {
                     number: String::new(),
                     name: "Materials".to_string(),
-                    description: "Browse the resources in this section.".to_string(),
                     open: false,
                     files: loose_files,
                 },
@@ -386,7 +382,6 @@
 
         let template = MaterialsTemplate {
             title,
-            course_name: "Foundations of Farming".to_string(),
             crumbs,
             sections,
         };
