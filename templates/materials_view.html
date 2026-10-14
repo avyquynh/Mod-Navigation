@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    {% for crumb in crumbs %}
+        {% if crumb.last %}
+            <span style="color:#1a7fc4; font-weight:bold;">{{ crumb.name }}</span>
+        {% else %}
+            <a href="{{ crumb.link }}">{{ crumb.name }}</a><span class="sep">&gt;</span>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="folder-head">
+    <h1>{{ title }}</h1>
+    <div class="folder-search">
+        <span class="mag">&#128269;</span>
+        <input type="text" placeholder="Search for resources" oninput="filterMaterials(this.value)">
+    </div>
+</div>
+
+<div class="course-title">
+    <img src="/header/logo.png" alt="" onerror="this.style.display='none'">
+    <h2>{{ course_name }}</h2>
+</div>
+
+<div class="materials" id="materials">
+    {% for section in sections %}
+    <div class="accordion {% if section.open %}open{% endif %}">
+        <div class="acc-header" onclick="toggleSection(this)">
+            <div class="acc-title">
+                <span class="acc-num">{{ section.number }}</span>
+                <span class="acc-name">{{ section.name }}</span>
+            </div>
+            <button class="acc-toggle" type="button">
+                <span class="chevron">&#9662;</span>
+            </button>
+        </div>
+        <p class="acc-desc">{{ section.description }}</p>
+        <div class="acc-body">
+            {% for file in section.files %}
+            <a class="file-row" href="{{ file.link }}" data-name="{{ file.name }}">
+                <span class="file-name">{{ file.name }}</span>
+                <span class="file-dl">&#8595;</span>
+            </a>
+            {% endfor %}
+            {% if section.files.is_empty() %}
+            <p class="acc-empty">No files in this section.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function toggleSection(header) {
+        header.closest('.accordion').classList.toggle('open');
+    }
+
+    function filterMaterials(query) {
+        query = query.toLowerCase();
+        document.querySelectorAll('#materials .accordion').forEach(function (acc) {
+            var anyVisible = false;
+            acc.querySelectorAll('.file-row').forEach(function (row) {
+                var name = row.getAttribute('data-name').toLowerCase();
+                var match = name.indexOf(query) !== -1;
+                row.style.display = match ? '' : 'none';
+                if (match) anyVisible = true;
+            });
+            // When searching, open any section that has a match and hide empty ones.
+            if (query === '') {
+                acc.style.display = '';
+            } else {
+                acc.style.display = anyVisible ? '' : 'none';
+                if (anyVisible) acc.classList.add('open');
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -46,6 +46,28 @@
     }
 
     #[derive(Template)]
+    #[template(path = "materials_view.html")]
+    struct MaterialsTemplate {
+        title: String,
+        course_name: String,
+        crumbs: Vec<Crumb>,
+        sections: Vec<MaterialSection>,
+    }
+
+    struct MaterialSection {
+        number: String,
+        name: String,
+        description: String,
+        open: bool,
+        files: Vec<MaterialFile>,
+    }
+
+    struct MaterialFile {
+        name: String,
+        link: String,
+    }
+
+    #[derive(Template)]
     #[template(path = "home.html")]
     struct HomeTemplate {
         topics: Vec<Card>,
@@ -158,7 +180,6 @@
             Err(_) => HttpResponse::NotFound().body("File not found"),
         }
     }
-    // Turn a folder/file name like "learning_materials" into "Learning Materials".
     fn prettify(name: &str) -> String {
         name.split(|c| c == '_' || c == '-' || c == ' ')
             .filter(|s| !s.is_empty())
@@ -173,8 +194,44 @@
             .join(" ")
     }
 
+    // Build a Home > ... > current breadcrumb for a folder path.
+    fn build_crumbs(folder_path: &str) -> (Vec<Crumb>, String) {
+        let mut crumbs = vec![Crumb {
+            name: "Home".to_string(),
+            link: "/".to_string(),
+            last: false,
+        }];
+
+        let segments: Vec<&str> = folder_path.split('/').filter(|s| !s.is_empty()).collect();
+        let mut accumulated = String::new();
+        for (i, seg) in segments.iter().enumerate() {
+            if !accumulated.is_empty() {
+                accumulated.push('/');
+            }
+            accumulated.push_str(seg);
+            crumbs.push(Crumb {
+                name: prettify(seg),
+                link: format!("/folder/{}", accumulated),
+                last: i == segments.len() - 1,
+            });
+        }
+
+        let title = segments
+            .last()
+            .map(|s| prettify(s))
+            .unwrap_or_else(|| "Library".to_string());
+
+        (crumbs, title)
+    }
+
     fn render_folder(folder_path: &str) -> HttpResponse {
-        if folder_path.trim_end_matches('/') != "root_folder" {
+        let trimmed = folder_path.trim_end_matches('/');
+
+        if trimmed == "root_folder" {
+            // falls through to the card layout below
+        } else if trimmed.ends_with("learning_materials") {
+            return render_materials(folder_path);
+        } else {
             return render_folder_list(folder_path);
         }
 
@@ -188,7 +245,6 @@
                 let path = entry.path();
                 let raw_name = path.file_name().unwrap().to_string_lossy().to_string();
 
-                // Skip hidden files like .DS_Store
                 if raw_name.starts_with('.') {
                     continue;
                 }
@@ -231,36 +287,108 @@
             }
         }
 
-        // Build breadcrumb from the path segments.
-        let mut crumbs = vec![Crumb {
-            name: "Home".to_string(),
-            link: "/".to_string(),
-            last: false,
-        }];
-
-        let segments: Vec<&str> = folder_path.split('/').filter(|s| !s.is_empty()).collect();
-        let mut accumulated = String::new();
-        for (i, seg) in segments.iter().enumerate() {
-            if !accumulated.is_empty() {
-                accumulated.push('/');
-            }
-            accumulated.push_str(seg);
-            crumbs.push(Crumb {
-                name: prettify(seg),
-                link: format!("/folder/{}", accumulated),
-                last: i == segments.len() - 1,
-            });
-        }
-
-        let title = segments
-            .last()
-            .map(|s| prettify(s))
-            .unwrap_or_else(|| "Library".to_string());
+        let (crumbs, title) = build_crumbs(folder_path);
 
         let template = FolderTemplate {
             title,
             crumbs,
             cards,
+        };
+
+        match template.render() {
+            Ok(body) => HttpResponse::Ok().content_type("text/html").body(body),
+            Err(_) => HttpResponse::InternalServerError().body("Template Error"),
+        }
+    }
+
+    // Accordion layout for learning_materials: each subfolder becomes a
+    // collapsible section, and the files inside become downloadable rows.
+    // Any files sitting directly in learning_materials are grouped into their
+    // own "Materials" section.
+    fn render_materials(folder_path: &str) -> HttpResponse {
+        let mut sections: Vec<MaterialSection> = Vec::new();
+        let mut loose_files: Vec<MaterialFile> = Vec::new();
+
+        if let Ok(entries) = fs::read_dir(folder_path) {
+            let mut sorted: Vec<_> = entries.flatten().collect();
+            sorted.sort_by_key(|e| e.file_name());
+
+            for entry in sorted {
+                let path = entry.path();
+                let raw_name = path.file_name().unwrap().to_string_lossy().to_string();
+
+                if raw_name.starts_with('.') {
+                    continue;
+                }
+
+                let rel_path = path.to_string_lossy().to_string();
+
+                if path.is_dir() {
+                    // Collect files inside this subfolder.
+                    let mut files = Vec::new();
+                    if let Ok(sub_entries) = fs::read_dir(&path) {
+                        let mut sub_sorted: Vec<_> = sub_entries.flatten().collect();
+                        sub_sorted.sort_by_key(|e| e.file_name());
+
+                        for sub in sub_sorted {
+                            let sub_path = sub.path();
+                            let sub_name =
+                                sub_path.file_name().unwrap().to_string_lossy().to_string();
+
+                            if sub_name.starts_with('.') || sub_path.is_dir() {
+                                continue;
+                            }
+
+                            files.push(MaterialFile {
+                                name: sub_name,
+                                link: format!("/file/{}", sub_path.to_string_lossy()),
+                            });
+                        }
+                    }
+
+                    sections.push(MaterialSection {
+                        number: String::new(), // numbered after collection
+                        name: prettify(&raw_name),
+                        description: "Browse the resources in this section.".to_string(),
+                        open: false,
+                        files,
+                    });
+                } else {
+                    loose_files.push(MaterialFile {
+                        name: raw_name,
+                        link: format!("/file/{}", rel_path),
+                    });
+                }
+            }
+        }
+
+        // Loose files (directly inside learning_materials) go into their own section at the top.
+        if !loose_files.is_empty() {
+            sections.insert(
+                0,
+                MaterialSection {
+                    number: String::new(),
+                    name: "Materials".to_string(),
+                    description: "Browse the resources in this section.".to_string(),
+                    open: false,
+                    files: loose_files,
+                },
+            );
+        }
+
+        // Number the sections (01, 02, ...) and open the first by default.
+        for (i, section) in sections.iter_mut().enumerate() {
+            section.number = format!("{:02}", i + 1);
+            section.open = i == 0;
+        }
+
+        let (crumbs, title) = build_crumbs(folder_path);
+
+        let template = MaterialsTemplate {
+            title,
+            course_name: "Foundations of Farming".to_string(),
+            crumbs,
+            sections,
         };
 
         match template.render() {
