@@ -2,25 +2,48 @@
 {% block title %}{{ name }}{% endblock %}
 
 {% block content %}
-<main class="content">
-<h1>{{ name }}</h1>
-<a href="javascript:history.back()">Back</a>
-
-<div class="content-container" style="margin-top: 20px;">
-    {% if file_type == "pdf" %}
-        <iframe src="{{ path }}" width="100%" height="800px" style="border: none;"></iframe>
-    {% else if file_type == "video" %}
-        <video controls>
-            <source src="{{ path }}" type="video/mp4">
-        </video>
-    {% else if file_type == "audio" %}
-        <audio controls>
-            <source src="{{ path }}" type="audio/mpeg">
-        </audio>
-    {% else if file_type == "html" %}
-        <iframe src="{{ path }}" width="100%" height="800px"></iframe>
-
-    {% endif %}
+<div class="breadcrumb">
+    {% for crumb in crumbs %}
+        {% if crumb.last %}
+            <span style="color:#1a7fc4; font-weight:bold;">{{ crumb.name }}</span>
+        {% else %}
+            <a href="{{ crumb.link }}">{{ crumb.name }}</a><span class="sep">&gt;</span>
+        {% endif %}
+    {% endfor %}
 </div>
-</main>
+
+<div class="file-layout">
+    <div class="file-media">
+        {% if file_type == "video" %}
+            <video controls>
+                <source src="{{ path }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% else if file_type == "audio" %}
+            <audio controls>
+                <source src="{{ path }}" type="audio/mpeg">
+                Your browser does not support the audio tag.
+            </audio>
+        {% else if file_type == "pdf" %}
+            <embed src="{{ path }}" type="application/pdf" class="pdf-embed">
+        {% else if file_type == "html" %}
+            <iframe src="{{ path }}" title="{{ name }}" class="html-embed"></iframe>
+        {% else %}
+            <p>This file type can't be previewed in the browser.</p>
+        {% endif %}
+    </div>
+
+    <aside class="file-details">
+        <p><span class="detail-label">Title</span><br>{{ name }}</p>
+        <p><span class="detail-label">Type</span><br>{{ type_label }}</p>
+        {% if !size.is_empty() %}
+        <p><span class="detail-label">Size</span><br>{{ size }}</p>
+        {% endif %}
+        {% if !location.is_empty() %}
+        <p><span class="detail-label">Location</span><br>{{ location }}</p>
+        {% endif %}
+        <p><a class="start-btn" href="{{ path }}" download>Download</a></p>
+        <p><a href="javascript:history.back()">Back</a></p>
+    </aside>
+</div>
 {% endblock %}

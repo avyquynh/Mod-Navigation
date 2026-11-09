@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock title %}
+
+{% block head %}{% include "reference_head.html" %}{% endblock head %}
+
+{% block content %}
+
+
+<div class="advanced-search-container">
+  <form id="search-form" onsubmit="return validateAdvancedSearch()">
+
+    <div class="form-grid">
+      <div class="form-group full-width">
+        <label for="title">Search Term</label>
+        <input type="text" id="title" name="title" value="{{ search_query }}">
+      </div>
+
+      <div class="full-width">
+        <button type="button" class="search-button toggle" id="toggle-advanced-search"
+          data-bs-toggle="collapse" data-bs-target="#advanced-fields"
+          aria-expanded="false" aria-controls="advanced-fields">
+          Advanced Search
+        </button>
+      </div>
+    </div>
+
+    <div id="advanced-fields" class="collapse">
+      <div class="form-grid">
+        {% for category in categories %}
+        <div class="form-group">
+          <label for="{{ category.type_name }}">{{ category.type_name }}</label>
+          <select
+            id="{{ category.type_name }}"
+            name="{{ category.type_name }}"
+            class="searchable-select"
+          >
+            <option value=""></option>
+            {% for value in category.values %}
+            <option value="{{ value }}"
+              {% if let Some(val) = active_filters.get(category.type_name.as_str()) %}
+                {% if val.as_str() == value.as_str() %}
+                  selected
+                {% endif %}
+              {% endif %}>
+              {{ value }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <button type="submit" class="search-button full-width">Search</button>
+    </div>
+
+  </form>
+</div>
+
+    <div class="table-container">
+        <div class="table-wrapper">
+            <table class="table table-striped table-hover table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Type</th>
+                        <th scope="col" class="asc" data-sort-by="title">Title</th>
+                        <th scope="col" data-sort-by="size">Size</th>
+                    </tr>
+                </thead>
+                <tbody id="file-list">
+                    {% for file in list %}
+                    <tr>
+                        <td>{{ loop.index }}</td> <td><i class="fa-solid fa-{% if file.file_type.as_str() == "video" %}file-video{% else %}file{% endif %}"></i></td>
+                        <td><a href="/file/{{ file.id }}">{{ file.title }}</a></td>
+                        <td>{{ file.size | filesizeformat }}</td> </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> 
+
+    </div>
+
+{% if total_pages > 1 %}
+<nav aria-label="Search result pages">
+  <ul class="pagination justify-content-center mt-3">
+    {% if current_page > 1 %}
+    <li class="page-item">
+      <a class="page-link" href="?title={{ search_query }}&page={{ prev_page }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}">
+        Previous
+      </a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+    {% endif %}
+
+{% for p in start_page..=end_page %}
+  <li class="page-item {% if p == current_page %}active{% endif %}">
+    <a class="page-link" href="?{{ self.make_url(*p) }}">{{ p }}</a>
+  </li>
+{% endfor %}
+
+    {% if current_page < total_pages %}
+    <li class="page-item">
+      <a class="page-link"
+         href="?title={{ search_query }}&page={{ current_page + 1 }}&sort_by={{ sort_by }}&sort_order={{ sort_order }}">
+        Next
+      </a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Next</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const params = new URLSearchParams(window.location.search);
+
+    // Open advanced fields if coming from the advanced search link,
+    // OR if any advanced filter is currently active
+    const advancedFields = document.getElementById('advanced-fields');
+    const hasAdvancedParams = [...params.keys()].some(k => k !== 'title' && k !== 'page' && k !== 'sort_by' && k !== 'sort_order');
+    const openAdvanced = params.get('advanced') === 'true' || hasAdvancedParams;
+
+    if (openAdvanced) {
+      new bootstrap.Collapse(advancedFields, { toggle: false }).show();
+      document.getElementById('toggle-advanced-search').setAttribute('aria-expanded', 'true');
+    }
+
+    // TomSelect on all searchable dropdowns
+    document.querySelectorAll('.searchable-select').forEach(function (select) {
+      new TomSelect(select, {
+        create: false,
+        sortField: { field: "text", direction: "asc" }
+      });
+    });
+  });
+
+  function validateAdvancedSearch() {
+    const inputs = document.querySelectorAll('#title, select');
+    const hasValue = [...inputs].some(input => input.value.trim() !== "");
+    if (!hasValue) {
+      alert("Please enter or select at least one search criteria!");
+      return false;
+    }
+    return true;
+  }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.searchable-select').forEach(function(select) {
+        new TomSelect(select, {
+            create: false,        // set to true if you want free typing allowed
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+    });
+});
+</script>
+
+{% endblock content %}

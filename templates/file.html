@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.title }}{% endblock title %}
+
+{% block head %}{% include "reference_head.html" %}{% endblock head %}
+
+{% block content %}
+
+<!--Missing: Collection Type, Library User, Subcategory, Education Level-->
+<div class="container">
+    <div class="row">
+        <div class="col">
+            {% if data.file_type == "mp4" %}
+                <video width="100%" controls>
+                    <source src="https://www.solarcubed.org/dev-content-ea/{{data.file_name}}" type="video/mp4">
+                </video>
+            {% endif %}
+
+            {% if data.file_type == "mp3" %}
+                <audio controls>
+                    <source src="https://www.solarcubed.org/dev-content-ea/{{data.file_name}}" type="audio/mpeg">
+                </audio>
+            {% endif %}
+
+            {% if data.file_type == "pdf" %}
+                <embed src="https://www.solarcubed.org/dev-content-ea/{{data.file_name}}" style="min-height:750px; width:100%;"></embed>
+            {% endif %}
+        </div>
+
+        <div class="col">
+        {% if data.title != "" %}
+            <br><p><span style="font-weight: 500;">Title</span><br>
+                {{data.title}}</p>
+        {% endif %}
+
+        {% if data.description != "" %}
+            <p><span style="font-weight: 500;">Description:</span><br>
+                {{data.description}}</p>
+        {% endif %}
+
+        {% if meta.language != "" %}
+            <p><span style="font-weight: 500;">Language:</span><br>
+                {{meta.language}}</p>
+        {% endif %}
+
+        {% if meta.keywords.len() > 0 %}
+            <p><span style="font-weight: 500;">Keywords:</span><br>
+                {% for keyword in meta.keywords %}
+                    <a class="keyword-link" href="/search?Keywords={{keyword}}">{{keyword}}</a>{% if !loop.last%} | {% endif %}
+                {% endfor %}</p>
+        {% endif %}
+
+        {% if meta.creators.len() > 0 %}
+            <p><span style="font-weight: 500;">Author:</span><br>
+                {% for creator in meta.creators %}
+                    {{creator}}</p>
+                {% endfor %}
+        {% endif %}
+
+{% if meta.resource_types.len() > 0 %}
+    <p><span style="font-weight: 500;">Resource Type:</span><br>
+        {% for typ in meta.resource_types %}
+            {{typ}}</p>
+        {% endfor %}
+{% endif %}
+
+        {% if meta.subjects.len() > 0 %}
+            <p><span style="font-weight: 500;">Subject:</span><br>
+                {% for subject in meta.subjects %}
+                    {{subject}}</p>
+                {% endfor %}
+        {% endif %}
+
+        {% if meta.audience.len() > 0 %}
+            <p><span style="font-weight: 500;">Audience:</span><br>
+                {% for member in meta.audience %}
+                    {{member}}</p>
+                {% endfor %}
+        {% endif %}
+
+        {% if meta.format != "" %}
+            <p><span style="font-weight: 500;">Format:</span><br>
+                {{meta.format}}</p>
+        {% endif %}
+
+        {% if meta.rights_holder != "" %}
+            <p><span style="font-weight: 500;">Rights Holder:</span><br>
+                {{meta.rights_holder}}</p>
+        {% endif %}
+
+        {% if data.rights_statement != "" %}
+            <p><span style="font-weight: 500;">Rights Statement:</span><br>
+                {{data.rights_statement}}</p>
+        {% endif %}
+
+{% if data.published_date != "" %}
+    <p><span style="font-weight: 500;">Year of Publication:</span><br>
+        {{data.published_date}}</p>
+{% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SolarSPELL{% endblock %}</title>
+    {% block head %}{% endblock %}
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -202,18 +203,6 @@
             min-width: 260px;
         }
         .folder-search input { border: none; outline: none; width: 100%; font-size: 13px; }
-        .folder-search .mag {
-            background: #1a7fc4;
-            color: #fff;
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
         /* ---- Filter pills ---- */
         .filter-pills {
             max-width: 1000px;
